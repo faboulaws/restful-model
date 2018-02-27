@@ -4,11 +4,13 @@
 A module that abstracts the process of consuming a REST endpoint from both client and server side.
 
 ## Usage
+~~~js
+const RestService = require('restful-model');
+~~~
 
 ### Create a new endpoint service
 
 ~~~js
-
 const userService = new RestService('http://example.com/api/v1');
 const userModel = userService.registerModel('User', '/users');
 
@@ -86,3 +88,51 @@ const article = articleService.query({id: i}, ['author','comments']);
 There is a limited length to requests queries large result set would fail.
 
 
+## Middlewares
+
+Middlewares are used to process server request. When defining middlewares the order of middlewares is important:
+- The first middleware receive the initial input. The initial input is the request options object.
+- The last middleware must return the final data of the response.
+
+# Defaults middlewares
+
+There are two default middlewares, a Request middleware and a Response middleware.When using the default middlewares, processing a request has the following steps
+- The first middleware receives the request options makes a request then passes the response to the next middleware
+- The Response middleware receives the response as input and return the response data.
+
+# Writing middleware
+
+Middleware function take 2 arguments
+
+- The first argument is the input. The input value would depend on the preceding middleware. It can be a request options a response or anything else.
+The first middleware always receives the request options.
+
+- The second argument is a callback used to deliver the middleware result to the next middleware
+
+~~~js
+
+function(input, next) {
+ const result = process(input); //.... do something with input
+ next(result)
+}
+~~~
+
+# Example: Adding Basic Authentication middleware
+
+~~~js
+const RestService = require('restful-model');
+const {fetchRequest, fetchResponse} = RestService.defaultMiddlewares;
+
+const userService = new RestService('http://example.com/api/v1');
+
+async function addBasicAuthHeader (httpRequestOptions, next) {
+  const {username, password} = await getAuthData();// imaginary function
+  const hash = base64Encode(`${username}:${password}`); // imaginary function
+  // add authorisation header
+  httpRequestOptions.headers['Authorization'] = `Basic ${hash}`;
+  // pass request options to the next middleware (fetchRequest)
+  next(httpRequestOptions);
+}
+
+userService.useMiddlewares([addBasicAuthHeader, fetchRequest, fetchResponse]);
+~~~

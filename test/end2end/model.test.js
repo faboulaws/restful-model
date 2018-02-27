@@ -10,7 +10,7 @@ const authorService = new RestService('http://localhost:0003');
 
 const articles = articleService.registerModel('Article', '/articles', RestService.modelConfig().hasOne('Author', 'author').hasMany('Comment', 'comments', 'articleId'));
 const comments = commentService.registerModel('Comment', '/comments');
-const author = authorService.registerModel('Author', '/authors', RestService.modelConfig().hasMany('Article', 'post'));
+const authors = authorService.registerModel('Author', '/authors', RestService.modelConfig().hasMany('Article', 'post'));
 
 describe('Rest Tests', () => {
   afterEach(() => {
