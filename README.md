@@ -1,8 +1,10 @@
-### Restful Model
+
+# Restful Model
+
 
 A module that abstracts the process of consuming a REST endpoint from both client and server side.
 
-### Usage
+# Usage
 
 ~~~js
 const RestService = require('restful-model');
@@ -63,7 +65,7 @@ const modelConfig = RestService.modelConfig()
 const userModel = userService.registerModel('User', '/users', modelConfig);
 ~~~~
 
-# Get a single item
+### Get a single item
 ~~~js
 // would get a article model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
 const article = articleService.get({id: i}, ['author','comments']);
@@ -72,7 +74,7 @@ const article = articleService.get({id: i}, ['author','comments']);
 // HTTP GET http://example.com/api/v1/comments?articleId[]=<user.id>
 ~~~
 
-# Get a multiple items
+### Get a multiple items
 
 ~~~js
 // would get a articles an eah item would have  model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
@@ -83,7 +85,7 @@ const article = articleService.query({id: i}, ['author','comments']);
 
 ~~~
 
-# Limitations
+### Limitations
 
 There is a limited length to requests queries large result set would fail.
 
@@ -94,13 +96,13 @@ Middlewares are used to process server request. When defining middlewares the or
 - The first middleware receive the initial input. The initial input is the request options object.
 - The last middleware must return the final data of the response.
 
-# Defaults middlewares
+### Defaults middlewares
 
 There are two default middlewares, a Request middleware and a Response middleware.When using the default middlewares, processing a request has the following steps
 - The first middleware receives the request options makes a request then passes the response to the next middleware
 - The Response middleware receives the response as input and return the response data.
 
-# Writing middleware
+### Writing middleware
 
 Middleware function take 2 arguments
 
@@ -117,7 +119,7 @@ function(input, next) {
 }
 ~~~
 
-# Example: Adding Basic Authentication middleware
+#### Example: Adding Basic Authentication middleware
 
 ~~~js
 const RestService = require('restful-model');
