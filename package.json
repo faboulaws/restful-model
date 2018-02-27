@@ -27,7 +27,6 @@
     "webpack-cli": "^2.0.9"
   },
   "dependencies": {
-    "cross-fetch": "^1.1.1",
     "isomorphic-fetch": "^2.2.1"
   }
 }
