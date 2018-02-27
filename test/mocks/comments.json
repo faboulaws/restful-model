@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "content": "Article 1 - comment 2",
+    "articleId": 1
+
+  },
+  {
+    "id": 2,
+    "title": "Article 1 - comment 2",
+    "articleId": 1
+  },
+  {
+    "id": 3,
+    "title": "Proper testing",
+    "articleId": 3
+  }
+]
