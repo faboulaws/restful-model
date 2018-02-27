@@ -1,14 +1,14 @@
-## Restful Model
-
+### Restful Model
 
 A module that abstracts the process of consuming a REST endpoint from both client and server side.
 
-## Usage
+### Usage
+
 ~~~js
 const RestService = require('restful-model');
 ~~~
 
-### Create a new endpoint service
+## Create a new endpoint service
 
 ~~~js
 const userService = new RestService('http://example.com/api/v1');
@@ -33,7 +33,7 @@ userModel.delete({id: 1}); // HTTP DELETE http://example.com/api/v1/users/1
 ~~~
 
 
-### Custom endpoints
+## Custom endpoints
 
 Use RestService model config to configure models
 
@@ -50,7 +50,7 @@ const friends = useService.getFiends({id: 1});
 
 ~~~
 
-### Model relationships
+## Model relationships
 
 ~~~js
 const articleService = new RestService('http://articles.example.com/api/v1');
@@ -63,7 +63,7 @@ const modelConfig = RestService.modelConfig()
 const userModel = userService.registerModel('User', '/users', modelConfig);
 ~~~~
 
-## Get a single item
+# Get a single item
 ~~~js
 // would get a article model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
 const article = articleService.get({id: i}, ['author','comments']);
@@ -72,7 +72,7 @@ const article = articleService.get({id: i}, ['author','comments']);
 // HTTP GET http://example.com/api/v1/comments?articleId[]=<user.id>
 ~~~
 
-## Get a multiple items
+# Get a multiple items
 
 ~~~js
 // would get a articles an eah item would have  model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
