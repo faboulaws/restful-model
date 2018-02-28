@@ -48,27 +48,31 @@ const modelConfig = RestService.modelConfig().customActions({
                             }
                           });
 const userModel = userService.registerModel('User', '/users', modelConfig);
-const friends = useService.getFiends({id: 1});
+const friends = userModel.getFiends({id: 1});
 
 ~~~
 
 ## Model relationships
 
 ~~~js
+// define services
 const articleService = new RestService('http://articles.example.com/api/v1');
 const authorService = new RestService('http://authors.example.com/api/v1');
 const commentService = new RestService('http:/comments.example.com/api/v1');
 
+// define models
 const modelConfig = RestService.modelConfig()
                          .hasMany('Comments', 'comments', 'articleId')
                          .hasOne('Author', 'author');
-const userModel = userService.registerModel('User', '/users', modelConfig);
+const articleModel = articleService.registerModel('Article', '/articles', modelConfig);
+const authorModel = authorService.registerModel('Author', '/authors');
+const commentModel = commentService.registerModel('Comment', '/comments');
 ~~~~
 
 ### Get a single item
 ~~~js
 // would get a article model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
-const article = articleService.get({id: i}, ['author','comments']);
+const article = articleModel.get({id: i}, ['author','comments']);
 // HTTP GET http://example.com/api/v1/articles/1
 // HTTP GET http://example.com/api/v1/authors?id[]=<article.authorId>
 // HTTP GET http://example.com/api/v1/comments?articleId[]=<user.id>
@@ -78,7 +82,7 @@ const article = articleService.get({id: i}, ['author','comments']);
 
 ~~~js
 // would get a articles an eah item would have  model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
-const article = articleService.query({id: i}, ['author','comments']);
+const article = articleModel.query({id: i}, ['author','comments']);
 // HTTP GET http://example.com/api/v1/articles
 // HTTP GET http://example.com/api/v1/authors?id[]=<article1.authorId>&id[]=<article2.authorId>
 // HTTP GET http://example.com/api/v1/comments?articleId[]=<article1.id>&articleId[]=<article2.id>
