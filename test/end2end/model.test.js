@@ -2,13 +2,13 @@ const {expect, assert} = require('chai');
 const nock = require('nock');
 
 const RestService = require('../../lib');
-const {mocks: {articleMocks, authorMocks, commentMocks, articleImageMocks}, helpers: {getAuthorsById, getCommentsByArticleId, getImagesByArticleId}} = require('../mocks');
+const {mocks: {articleMocks, authorMocks, commentMocks}, helpers: {getAuthorsById, getCommentsByArticleId, getImagesByArticleId}} = require('../mocks');
 
 const articleService = new RestService('http://localhost:0001');
 const commentService = new RestService('http://localhost:0002');
 const authorService = new RestService('http://localhost:0003');
 
-const articles = articleService.registerModel('Article', '/articles', RestService.modelConfig().hasOne('Author', 'author').hasMany('Comment', 'comments', 'articleId'));
+const articles = articleService.registerModel('Article', '/articles', RestService.modelConfig().hasOne('Author', 'author', 'id', 'authorId').hasMany('Comment', 'comments', 'articleId'));
 const comments = commentService.registerModel('Comment', '/comments');
 const authors = authorService.registerModel('Author', '/authors', RestService.modelConfig().hasMany('Article', 'post'));
 
@@ -47,7 +47,7 @@ describe('Rest Tests', () => {
 
       nock('http://localhost:0003')
           .get('/authors')
-          .query({id: [1, 2, 3]})
+          .query({id: [107, 56, 50]})
           .reply(200, authorMocks);
 
       nock('http://localhost:0002')
@@ -64,7 +64,7 @@ describe('Rest Tests', () => {
     it('returns articles with single author', async () => {
       const result = await  articles.query({}, ['author']);
       result.forEach((article) => {
-        expect(article).to.eql(Object.assign({}, article, {'author': getAuthorsById(article.id)[0] || null}));
+        expect(article).to.eql(Object.assign({}, article, {'author': getAuthorsById(article.authorId)[0] || null}));
       });
     });
 
@@ -84,8 +84,8 @@ describe('Rest Tests', () => {
 
       nock('http://localhost:0003')
           .get('/authors')
-          .query({id: 1})
-          .reply(200, getAuthorsById(1));
+          .query({id: 107})
+          .reply(200, getAuthorsById(107));
 
       nock('http://localhost:0002')
           .get('/comments')
@@ -100,7 +100,7 @@ describe('Rest Tests', () => {
 
     it('returns 1 article with single author', async () => {
       const article = await  articles.get({id: 1}, ['author']);
-      expect(article).to.eql(Object.assign({}, article, {'author': getAuthorsById(article.id)[0] || null}));
+      expect(article).to.eql(Object.assign({}, article, {'author': getAuthorsById(article.authorId)[0] || null}));
     });
 
     it('returns 1 article with comments array', async () => {

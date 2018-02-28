@@ -63,7 +63,7 @@ const commentService = new RestService('http:/comments.example.com/api/v1');
 // define models
 const modelConfig = RestService.modelConfig()
                          .hasMany('Comments', 'comments', 'articleId')
-                         .hasOne('Author', 'author');
+                         .hasOne('Author', 'author', 'id', 'authorId');
 const articleModel = articleService.registerModel('Article', '/articles', modelConfig);
 const authorModel = authorService.registerModel('Author', '/authors');
 const commentModel = commentService.registerModel('Comment', '/comments');
