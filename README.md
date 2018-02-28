@@ -10,7 +10,7 @@ A module that abstracts the process of consuming a REST endpoint from both clien
 const RestService = require('restful-model');
 ~~~
 
-## Create a new endpoint service
+## Create a new service endpoint
 
 ~~~js
 const userService = new RestService('http://example.com/api/v1');
@@ -23,7 +23,7 @@ userModel.query({}); // HTTP GET http://example.com/api/v1/users
 userModel.get({id: 1}); // HTTP GET http://example.com/api/v1/users/1
 
 // create user
-userModel.create({id: 1}, {full_name: "John Doe"}); // HTTP POST http://example.com/api/v1/users
+userModel.create({full_name: "John Doe"}); // HTTP POST http://example.com/api/v1/users
 
 // update user
 userModel.update({id: 1}, {full_name: "John Doe"}); // HTTP PUT http://example.com/api/v1/users/1
