@@ -71,7 +71,7 @@ These 2 methods define model relationship and have the same signature.
 |name(required)|The name of the model |`string`||
 |fieldName |The name of the field when joining models. Also used as a relation key|`string`||
 |foreignField(optional) or config|*  When this argument is a string, it is used as the foreign key of the referenced model.<br> * When this argument is an object the next argument is skipped and all setting can be defined in it.<br>     Options:<br> -  **using** (string) define the method to call on the referenced model<br> - **localField(string)**<br> - **foreignField(string)**<br> - **fetchMode(string) (combined\|exclusive) default('combined')**<br> when *combined* one request is sent for all entries<br> when *exclusive* a request is made per entry<br> - **params (object)** used to define path and query params. Giving a param the same name as a placeholder in the path would inject it in the path. All other params would be used in query string. To use a param from an entry set it value to the name of the target field and prefix it by an @ sign  |`string` or `object`|'id'|
-|localField(optional)| The local field in the relation. Ignored when foreignField is an object|`string[]`|'id'|
+|localField(optional)| The local field in the relation. Ignored when foreignField is an object|`string`|'id'|
 
 
 ~~~js
