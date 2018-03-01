@@ -1,9 +1,11 @@
 [
   {
     "id": 56,
-    "fullName": "John Doe"
+    "fullName": "John Doe",
+    "profilePhotoId": 20
   },{
     "id": 107,
-    "fullName": "Jane Doe"
+    "fullName": "Jane Doe",
+  "profilePhotoId": 590
   }
 ]

@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "type": "image",
+    "content_type": "article",
+    "content_id": 1,
+    "data": {
+      "src": "http://images/hgjghj.jpg"
+    }
+  },
+  {
+    "id": 2,
+    "type": "image",
+    "content_type": "article",
+    "content_id": 1,
+    "data": {
+      "src": "http://images/hgjkkhj.jpg"
+    }
+  },
+  {
+    "id": 20,
+    "type": "image",
+    "content_type": "author",
+    "content_id": 56,
+    "data": {
+      "src": "http://images/hgjkkhj.jpg"
+    }
+  },  {
+    "id": 590,
+    "type": "image",
+    "content_type": "author",
+    "content_id": 107,
+    "data": {
+      "src": "http://images/hgjkkhj.jpg"
+    }
+  },
+  {
+    "id": 3,
+    "type": "video",
+    "content_type": "article",
+    "content_id": 4,
+    "data": {
+      "youtube": ""
+    }
+  }
+]

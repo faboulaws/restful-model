@@ -2,15 +2,31 @@ const {expect, assert} = require('chai');
 const nock = require('nock');
 
 const RestService = require('../../lib');
-const {mocks: {articleMocks, authorMocks, commentMocks}, helpers: {getAuthorsById, getCommentsByArticleId, getImagesByArticleId}} = require('../mocks');
+const {
+  mocks: {articleMocks, authorMocks, commentMocks, mediaMocks},
+  helpers: {getAuthorsById, getCommentsByArticleId, getImagesByArticleId, getImagesById}
+} = require('../mocks');
 
 const articleService = new RestService('http://localhost:0001');
 const commentService = new RestService('http://localhost:0002');
 const authorService = new RestService('http://localhost:0003');
+const mediaService = new RestService('http://localhost:0004');
 
-const articles = articleService.registerModel('Article', '/articles', RestService.modelConfig().hasOne('Author', 'author', 'id', 'authorId').hasMany('Comment', 'comments', 'articleId'));
+const articleConfig = RestService.modelConfig()
+    .hasOne('Author', 'author', 'id', 'authorId')
+    .hasMany('Comment', 'comments', 'articleId')
+    .hasMany('Media', 'images', {
+      fetchMode: 'exclusive', // exclusive | combined , exclusive = 1 request per entry, combined 1 request for all entry with query string filter
+      params: {content_type: 'articles', media_type: 'images', content_id: '@id', size: 'thumb'}
+    });
+const articles = articleService.registerModel('Article', '/articles', articleConfig);
 const comments = commentService.registerModel('Comment', '/comments');
-const authors = authorService.registerModel('Author', '/authors', RestService.modelConfig().hasMany('Article', 'post'));
+const authors = authorService.registerModel('Author', '/authors', RestService.modelConfig().hasMany('Article', 'post').hasOne('Media', 'photo', {
+  fetchMode: 'exclusive',
+  using: 'get',
+  params: {content_type: 'authors', media_type: 'images', content_id: '@id', id: '@profilePhotoId', size: 'medium'}
+}));
+const media = mediaService.registerModel('Media', '/:content_type/:content_id/media/:media_type');
 
 describe('Rest Tests', () => {
   afterEach(() => {
@@ -50,10 +66,41 @@ describe('Rest Tests', () => {
           .query({id: [107, 56, 50]})
           .reply(200, authorMocks);
 
+      nock('http://localhost:0003')
+          .get('/authors')
+          .reply(200, authorMocks);
+
       nock('http://localhost:0002')
           .get('/comments')
           .query({articleId: [1, 2, 3]})
           .reply(200, commentMocks);
+
+      // media
+      nock('http://localhost:0004')
+          .get('/articles/1/media/images')
+          .query({size: 'thumb'})
+          .reply(200, getImagesByArticleId(1));
+
+      nock('http://localhost:0004')
+          .get('/articles/2/media/images')
+          .query({size: 'thumb'})
+          .reply(200, getImagesByArticleId(2));
+
+      nock('http://localhost:0004')
+          .get('/articles/3/media/images')
+          .query({size: 'thumb'})
+          .reply(200, getImagesByArticleId(3));
+
+      // author media
+      nock('http://localhost:0004')
+          .get('/authors/56/media/images/20')
+          .query({size: 'medium'})
+          .reply(200, getImagesById(authorMocks[0].profilePhotoId)[0]);
+
+      nock('http://localhost:0004')
+          .get('/authors/107/media/images/590')
+          .query({size: 'medium'})
+          .reply(200, getImagesById(authorMocks[1].profilePhotoId)[0]);
     });
 
     it('return articles', async () => {
@@ -74,6 +121,20 @@ describe('Rest Tests', () => {
         expect(article).to.eql(Object.assign({}, article, {'comments': getCommentsByArticleId(article.id)}));
       });
     });
+
+    it('returns articles with media array', async () => {
+      const result = await  articles.query({}, ['images']);
+      result.forEach((article) => {
+        expect(article).to.eql(Object.assign({}, article, {'images': getImagesByArticleId(article.id)}));
+      });
+    });
+
+    it('returns authors with photo', async () => {
+      const result = await  authors.query({}, ['photo']);
+      result.forEach((article) => {
+        expect(article).to.eql(Object.assign({}, article, {'photo': getImagesById(article.profilePhotoId)[0]}));
+      });
+    });
   });
 
   describe('get', () => {
@@ -87,10 +148,25 @@ describe('Rest Tests', () => {
           .query({id: 107})
           .reply(200, getAuthorsById(107));
 
+      nock('http://localhost:0003')
+          .get('/authors/107')
+          .reply(200, getAuthorsById(107)[0]);
+
       nock('http://localhost:0002')
           .get('/comments')
           .query({articleId: 1})
           .reply(200, getCommentsByArticleId(1));
+
+      nock('http://localhost:0004')
+          .get('/articles/1/media/images')
+          .query({size: 'thumb'})
+          .reply(200, getImagesByArticleId(1));
+
+      // author media
+      nock('http://localhost:0004')
+          .get('/authors/107/media/images/590')
+          .query({size: 'medium'})
+          .reply(200, getImagesById(authorMocks[1].profilePhotoId)[0]);
     });
 
     it('return 1 article', async () => {
@@ -106,6 +182,16 @@ describe('Rest Tests', () => {
     it('returns 1 article with comments array', async () => {
       const article = await  articles.get({id: 1}, ['comments']);
       expect(article).to.eql(Object.assign({}, article, {'comments': getCommentsByArticleId(article.id)}));
+    });
+
+    it('returns 1 article with media array', async () => {
+      const article = await  articles.get({id: 1}, ['images']);
+      expect(article).to.eql(Object.assign({}, article, {'images': getImagesByArticleId(article.id)}));
+    });
+
+    it('returns 1 author with photo', async () => {
+      const author = await  authors.get({id: 107}, ['photo']);
+      expect(author).to.eql(Object.assign({}, author, {'photo': getImagesById(author.profilePhotoId)[0]}));
     });
   });
 
