@@ -7,7 +7,8 @@
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha test/*",
     "build": "npx webpack",
-    "lint": "npx eslint lib/*.js test/*js"
+    "lint": "npx eslint lib/*.js test/*js",
+    "lint:fix": "npm run lint -- --fix"
   },
   "repository": {
     "type": "git",
