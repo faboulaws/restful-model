@@ -1,3 +1,11 @@
+## v0.0.12 (2018-03-05)
+
+Changelog update
+
+## v0.0.11 (2018-03-05)
+
+Code cleanup
+
 ## v0.0.8 (2018-03-05)
 
 - Middlewares: Originally all middlewares defined are called during a request. In this release, any middleware can exit the chain an resolve a request with a response. The following middlewares would not be called. A good use case is for caching of requests.
