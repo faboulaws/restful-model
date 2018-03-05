@@ -1,7 +1,17 @@
 #! /bin/sh
 
 echo 'Running lint'
-npm run lint
+npm run lint:fix
+
+RETVAL=$?
+
+if [ $RETVAL -ne 0 ]; then
+ exit 1
+fi
+
+
+echo 'Running tests'
+npm test
 
 RETVAL=$?
 
