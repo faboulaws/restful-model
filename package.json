@@ -1,6 +1,6 @@
 {
   "name": "restful-model",
-  "version": "0.0.8",
+  "version": "0.0.7",
   "description": "An Isomorphic ORM for rest APIs",
   "main": "lib/index.js",
   "browser": "dist/index.js",
@@ -10,7 +10,7 @@
     "lint": "npx eslint lib/*.js test/*js",
     "lint:fix": "npm run lint -- --fix",
     "version:inc": "npm version patch",
-    "version:tag": "PACKAGE_VERSION=$(node -p -e \"require('./package.json').version\") && git tag \"v$PACKAGE_VERSION\" && git push --tags",
+    "version:tag": "git push --tags",
     "npm:pub": "npm publish --registry=https://registry.npmjs.org/ --access=public",
     "pub": "npm run version:inc && npm run version:tag && npm:pub"
   },
