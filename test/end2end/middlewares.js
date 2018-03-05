@@ -1,13 +1,14 @@
-const {expect, assert} = require('chai');
-const nock = require('nock');
+"use strict";
 
+const {expect, assert} = require('chai');
+const sinon = require('sinon');
 const RestService = require('../../lib');
 
 describe('middlewares', () => {
   it('error handling', async () => {
     const service = new RestService('http://localhost:0001');
     service.useMiddlewares([
-      function addInfoHeader(input, next) {
+      function addInfoHeader() {
         throw new Error('Failure ...');
       },
       function reqAndRes(input, next) {
@@ -63,4 +64,34 @@ describe('middlewares', () => {
     expect(res).to.eql({ok: true, info: 'Info ...'});
   });
 
+  it('must call last middleware only once', async () => {
+    const service = new RestService('http://localhost:0050');
+    let cache = {};
+    const one = function one(input, next, resolve) {
+      if (cache[input.url]) {
+        resolve(cache[input.url]);
+      } else {
+        next({name: 'abc'}, input);
+      }
+    };
+    const two = function one(input, next, resolve, xtra) {
+      cache[xtra.url] = input;
+      next(input);
+    };
+    const spyOne = sinon.spy(one);
+    const spyTwo = sinon.spy(two);
+    service.useMiddlewares([
+      spyOne,
+      spyTwo
+    ]);
+
+    const model = service.registerModel('Model', '/models');
+    await model.get({});
+    assert(spyOne.calledOnce, 'Must fail when a middleware throws and error');
+    assert(spyTwo.calledOnce, 'Must fail when a middleware throws and error');
+
+    await model.get({});
+    assert(spyOne.calledTwice, 'Must fail when a middleware throws and error');
+    assert(spyTwo.calledOnce, 'Must fail when a middleware throws and error');
+  });
 });
