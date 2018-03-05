@@ -9,10 +9,9 @@
     "build": "npx webpack",
     "lint": "npx eslint lib/*.js test/*js",
     "lint:fix": "npm run lint -- --fix",
-    "version:inc": "npm version patch",
-    "version:tag": "git push --tags",
+    "version:inc": "npm version patch && git push --tags",
     "npm:pub": "npm publish --registry=https://registry.npmjs.org/ --access=public",
-    "pub": "npm run version:inc && npm run version:tag && npm:pub"
+    "pub": "npm run version:inc && npm:pub"
   },
   "repository": {
     "type": "git",
