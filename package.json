@@ -11,7 +11,7 @@
     "lint:fix": "npm run lint -- --fix",
     "version:inc": "npm version patch && git push --tags",
     "npm:pub": "npm publish --registry=https://registry.npmjs.org/ --access=public",
-    "pub": "npm run version:inc && npm:pub"
+    "pub": "npm run version:inc && npm run npm:pub"
   },
   "repository": {
     "type": "git",
