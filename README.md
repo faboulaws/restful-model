@@ -23,7 +23,7 @@ const userService = new RestService('http://example.com/api/v1');
 const userModel = userService.registerModel('User', '/users');
 
 // get all users
-const usres = await userModel.query({view: 'thin'}); // HTTP GET http://example.com/api/v1/users?view=thin
+const users = await userModel.query({view: 'thin'}); // HTTP GET http://example.com/api/v1/users?view=thin
 
 // get user by ID
 const user = await userModel.get({id: 1, view: 'full'}); // HTTP GET http://example.com/api/v1/users/1?view=full
@@ -60,11 +60,11 @@ const friends = await userModel.getFiends({id: 1, view: 'thin'});
 
 ## Model relationships
 
-Relationship can be configured using the ResService.modelConfig() method. This method return an instance of ModelConfig class.
+Relationship can be configured using the RestService.modelConfig() method. This method return an instance of ModelConfig class.
 
 ### hasOne() and hasMany()
 
-These 2 methods define model relationship and have the same signature.
+These 2 methods of the ModelConfig class define model relationship and have the same signature.
 
 |Parameter|Description|Type|Default Value|
 |--------|-----------|----|--------|
@@ -73,6 +73,7 @@ These 2 methods define model relationship and have the same signature.
 |foreignField(optional) or config|*  When this argument is a string, it is used as the foreign key of the referenced model.<br> * When this argument is an object the next argument is skipped and all setting can be defined in it.<br>     Options:<br> -  **using** (string) define the method to call on the referenced model<br> - **localField(string)**<br> - **foreignField(string)**<br> - **fetchMode(string) (combined\|exclusive) default('combined')**<br> when *combined* one request is sent for all entries<br> when *exclusive* a request is made per entry<br> - **params (object)** used to define path and query params. Giving a param the same name as a placeholder in the path would inject it in the path. All other params would be used in query string. To use a param from an entry set it value to the name of the target field and prefix it by an @ sign  |`string` or `object`|'id'|
 |localField(optional)| The local field in the relation. Ignored when foreignField is an object|`string`|'id'|
 
+### Model relationships: Configuration Example
 
 ~~~js
 // define services
@@ -89,7 +90,9 @@ const authorModel = authorService.registerModel('Author', '/authors');
 const commentModel = commentService.registerModel('Comment', '/comments');
 ~~~~
 
-### Get a single item
+### Model relationship: Example use cases with combined fetchMode
+
+#### Get a single item (article) and fetch related entities (author, comment)
 ~~~js
 // Would get an article model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
 const article = await articleModel.get({id: i}, ['author','comments']);
@@ -98,7 +101,7 @@ const article = await articleModel.get({id: i}, ['author','comments']);
 // HTTP GET http://example.com/api/v1/comments?articleId[]=<user.id>
 ~~~
 
-### Get a multiple items
+#### Get a multiple items (article) and fetch related entities (author, comment)
 
 ~~~js
 // Would get articles. Each item would have model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
@@ -109,11 +112,13 @@ const article = await articleModel.query({}, ['author','comments']);
 
 ~~~
 
-##### Limitations
+###### Limitations
 
-Request URL have limited length. When querying related models a request is sent to the referenced model endpoint with a query param for each item fetched. This could cause the URL to reach it limit.
+The examples above use a fetching of related entities with **fetchMode** of type **combined** ([see](##model-relationships)). This means that a single request is made to access the related entities of retrieved items.
+In the above example, a single request is made to retrieve all authors related to all collected articles. This single request is made with all author IDs in a query string.
+However, this could cause lengthy Request URLs. And since URL have limited size (depends on the server and browser), request will large data set would fail. It is advised to use it only on small data set.
 
-## Model relationships - Advanced
+## Model relationships: Example use cases with exclusive fetchMode
 
 ~~~js
 // set up
@@ -131,7 +136,7 @@ const authorModel = authorService.registerModel('Author', '/authors', RestServic
 const media = mediaService.registerModel('Media', '/:content_type/:content_id/media/:media_type');
 ~~~
 
-### Get a single item by calling .get() on referenced model (modelConfig.hasOne())
+#### Get a single item with related entity (hasOne)
 
 ~~~js
 const author = await authorModel.get({id: 107}, ['photo']);
@@ -140,7 +145,7 @@ const author = await authorModel.get({id: 107}, ['photo']);
 
 ~~~
 
-### Get a single item by calling .query() on referenced model (modelConfig.hasMany())
+#### Get a single item with related entities (hasMany)
 
 ~~~js
 const article = await articleModel.get({id: 1}, ['images']);
@@ -149,7 +154,7 @@ const article = await articleModel.get({id: 1}, ['images']);
 
 ~~~
 
-### Get multiple items by calling .get() on referenced model (modelConfig.hasMany())
+#### Get multiple items with related entities (hasOne)
 
 ~~~js
 const authors = await authorModel.query({}, ['photo']);
@@ -162,8 +167,7 @@ const authors = await authorModel.query({}, ['photo']);
 
 ~~~
 
-
-### Get multiple items by calling .query() on referenced model (modelConfig.hasMany())
+#### Get multiple items with related entities (hasMany)
 
 ~~~js
 const article = await articleModel.query({}, ['images']);
@@ -176,10 +180,12 @@ const article = await articleModel.query({}, ['images']);
 
 ~~~
 
+##### Limitations
+A request is made for each item. Consider using caching where relevant.
 
 ## Middlewares
 
-Middlewares are used to process server request. When defining middlewares the order of middlewares is important:
+Middlewares are used to process server requests. When defining middlewares the order of middlewares is important:
 - The first middleware receive the initial input. The initial input is the request options object.
 - The last middleware must return the final data of the response.
 
@@ -191,18 +197,27 @@ There are two default middlewares, a Request middleware and a Response middlewar
 
 ### Writing middleware
 
-Middleware function take 2 arguments
+Middleware function arguments
 
-- The first argument is the input. The input value would depend on the preceding middleware. It can be a request options a response or anything else.
-The first middleware always receives the request options.
 
-- The second argument is a callback used to deliver the middleware result to the next middleware
+|Parameter|Type|Description
+|---------|-------|--------
+|input    | `mixed`|The input value would depend on the preceding middleware. It can be a request options a response or anything else. The first middleware always receives the request options.
+|next     |`function`|The callback used to deliver the middleware result to the next middleware.
+|resolve  | `function`|The resolver callback. This callback can be used to skip the rest of the middlewares and resolve the request with response data.
+
+Aside the arguments listed above, other arguments can be passed to  the following middleware by calling **next()** with additional argumemts. The additional arguments would be appended the argument list of the next middleware function.
+
 
 ~~~js
 
-function(input, next) {
- const result = process(input); //.... do something with input
- next(result)
+function(input, next, resolve, ...extraArgs) {
+  const result = process(input); //.... do something with input
+  if(/*some condition*/){
+     next(result, ...extraArgs)// pass result to next middleware
+  } else {
+    resolve(result);// exit middleware chain with result
+  }
 }
 ~~~
 
@@ -224,4 +239,43 @@ async function addBasicAuthHeader (httpRequestOptions, next) {
 }
 
 userService.useMiddlewares([addBasicAuthHeader, fetchRequest, fetchResponse]);
+~~~
+
+
+#### Example: Adding Cache middleware
+
+~~~js
+const userService = new RestService('http://example.com/api/v1');
+const userModel = userService.registerModel('User', '/users');
+
+let cache = {};// very minimal cache. Ideally a more sophistictated cache should be used.
+
+const requestHandler = function requestHandler(input, next, resolve) {
+  if (cache[input.url]) { // use caches
+    resolve(cache[input.url]);
+  } else { // continure with the request
+    next(makeRequest(input), input);// passes the original input. the next middleware would receive it as extra argument
+  }
+};
+
+const responseHandler = function responseHandler(input, next, resolve, originalInput) {
+  if(originalIpunt.method === 'GET') {
+     cache[originalInput.url] = input;// save only get request
+  } else if(originalIpunt.method !== 'GET' && cache[originalInput.url]) { // PUT, DELETE, POST
+    delete cache[originalInput.url]; delete GET path if model was updated
+  }
+  next(input);
+};
+
+userService.useMiddlewares([requestHandler, responseHandler]);
+
+// get all users - this call goes to the server
+const users = await userModel.query({view: 'thin'}); // HTTP GET http://example.com/api/v1/users?view=thin
+
+// get all users - the next call does not. Data is fetched from cache
+const users = await userModel.query({view: 'thin'}); // HTTP GET http://example.com/api/v1/users?view=thin
+
+// get all users - this call goes to the server since a different param was passed
+const users = await userModel.query({view: 'full'}); // HTTP GET http://example.com/api/v1/users?view=thin
+
 ~~~
