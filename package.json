@@ -1,6 +1,6 @@
 {
   "name": "restful-model",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "An Isomorphic ORM for rest APIs",
   "main": "lib/index.js",
   "browser": "dist/index.js",
