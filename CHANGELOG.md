@@ -1,8 +1,16 @@
+## v0.0.13 (2018-03-05)
+
+Doc update
+
 ## v0.0.12 (2018-03-05)
 
 Changelog update
 
 ## v0.0.11 (2018-03-05)
+
+Chang Log update
+
+## v0.0.10 (2018-03-05)
 
 Code cleanup
 

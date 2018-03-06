@@ -270,12 +270,12 @@ const responseHandler = function responseHandler(input, next, resolve, originalI
 userService.useMiddlewares([requestHandler, responseHandler]);
 
 // get all users - this call goes to the server
-const users = await userModel.query({view: 'thin'}); // HTTP GET http://example.com/api/v1/users?view=thin
+let users = await userModel.query({view: 'thin'}); // HTTP GET http://example.com/api/v1/users?view=thin
 
 // get all users - the next call does not. Data is fetched from cache
-const users = await userModel.query({view: 'thin'}); // HTTP GET http://example.com/api/v1/users?view=thin
+users = await userModel.query({view: 'thin'}); // HTTP GET http://example.com/api/v1/users?view=thin
 
 // get all users - this call goes to the server since a different param was passed
-const users = await userModel.query({view: 'full'}); // HTTP GET http://example.com/api/v1/users?view=thin
+users = await userModel.query({view: 'full'}); // HTTP GET http://example.com/api/v1/users?view=thin
 
 ~~~
