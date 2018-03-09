@@ -7,6 +7,8 @@ const config = {
   output: {
     filename: 'index.js',
     path: PATH.resolve(__dirname, 'dist'),
+    library: 'RestService',
+    libraryTarget: 'umd',
   }, devtool: 'source-map'
 };
 
