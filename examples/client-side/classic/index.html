@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../../../dist/index.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+  var githubService = new RestService('https://api.github.com');
+  var githubUser = githubService.registerModel('User', '/users', RestService.modelConfig().customActions({
+    getRepos: {
+      method: 'GET',
+      path: '/:id/repos'
+    }
+  }));
+  githubUser.get({id: 'facebook'}).then(function (result) {
+    console.log(result, 'result');
+  });
+  githubUser.getRepos({id: 'facebook'}).then(function (result) {
+    console.log(result, 'result');
+  });
+</script>
+</body>
+</html>

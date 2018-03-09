@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+  require.config({
+    paths: {
+      RestService: '../../../dist/index'
+    }
+  });
+
+  requirejs(['RestService'],
+      function (RestService,) {
+        //jQuery, canvas and the app/sub module are all
+        //loaded and can be used here now.
+
+        var githubService = new RestService('https://api.github.com');
+        var githubUser = githubService.registerModel('User', '/users', RestService.modelConfig().customActions({
+          getRepos: {
+            method: 'GET',
+            path: '/:id/repos'
+          }
+        }));
+        githubUser.get({id: 'facebook'}).then(function (result) {
+          console.log(result, 'result');
+        });
+        githubUser.getRepos({id: 'facebook'}).then(function (result) {
+          console.log(result, 'result');
+        });
+      });
+</script>
+</body>
+</html>
