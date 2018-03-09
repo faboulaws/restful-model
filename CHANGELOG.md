@@ -1,3 +1,9 @@
+## v0.0.14 (2018-03-05)
+
+Bug Fix
+
+   - Proper client side support
+
 ## v0.0.13 (2018-03-05)
 
 Doc update
