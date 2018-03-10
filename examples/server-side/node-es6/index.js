@@ -1,8 +1,8 @@
 'use strict';
 
 const RestService = require('../../../lib/index');
-var githubService = new RestService('https://api.github.com');
-var githubUser = githubService.registerModel('User', '/users', RestService.modelConfig().customActions({
+const githubService = new RestService('https://api.github.com');
+const githubUser = githubService.registerModel('User', '/users', RestService.modelConfig().customActions({
   getRepos: {
     method: 'GET',
     path: '/:id/repos'
