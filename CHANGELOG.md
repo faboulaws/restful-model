@@ -1,3 +1,9 @@
+## v0.0.15 (2018-03-11)
+
+Bug Fix
+
+   - Cannot set custom ID field in model configuration
+
 ## v0.0.14 (2018-03-05)
 
 Bug Fix

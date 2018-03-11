@@ -3,9 +3,10 @@
     "id": 56,
     "fullName": "John Doe",
     "profilePhotoId": 20
-  },{
+  },
+  {
     "id": 107,
     "fullName": "Jane Doe",
-  "profilePhotoId": 590
+    "profilePhotoId": 590
   }
 ]

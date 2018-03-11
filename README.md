@@ -58,13 +58,24 @@ const friends = await userModel.getFiends({id: 1, view: 'thin'});
 // HTTP GET http://example.com/api/v1/users/1/friends?view=thin
 ~~~
 
-## Model relationships
+## Configure a model settings
 
-Relationship can be configured using the RestService.modelConfig() method. This method return an instance of ModelConfig class.
+Models can be configured using the RestService.modelConfig() method. This method return an instance of ModelConfig class.
 
-### hasOne() and hasMany()
+### Model Config - setIdField()
 
-These 2 methods of the ModelConfig class define model relationship and have the same signature.
+Model id field can be configured using the **setIdField** method the the ModelConfig class.
+
+~~~js
+const modelConfig = RestService.modelConfig().idField('userId'); // configure the name of the ID field
+const userService = new RestService('http://example.com/api/v1');
+const userModel = userService.registerModel('Users','/users')
+~~~
+
+
+### Model Config - relationships
+
+Relationship can be configured using the **hasMany** and **hasOne** methods of the  ModelConfig class. These 2 methods of the ModelConfig class define model relationship and have the same signature.
 
 |Parameter|Description|Type|Default Value|
 |--------|-----------|----|--------|
@@ -73,7 +84,7 @@ These 2 methods of the ModelConfig class define model relationship and have the 
 |foreignField(optional) or config|*  When this argument is a string, it is used as the foreign key of the referenced model.<br> * When this argument is an object the next argument is skipped and all setting can be defined in it.<br>     Options:<br> -  **using** (string) define the method to call on the referenced model<br> - **localField(string)**<br> - **foreignField(string)**<br> - **fetchMode(string) (combined\|exclusive) default('combined')**<br> when *combined* one request is sent for all entries<br> when *exclusive* a request is made per entry<br> - **params (object)** used to define path and query params. Giving a param the same name as a placeholder in the path would inject it in the path. All other params would be used in query string. To use a param from an entry set it value to the name of the target field and prefix it by an @ sign  |`string` or `object`|'id'|
 |localField(optional)| The local field in the relation. Ignored when foreignField is an object|`string`|'id'|
 
-### Model relationships: Configuration Example
+#### Model relationships: Configuration Example
 
 ~~~js
 // define services
@@ -90,9 +101,9 @@ const authorModel = authorService.registerModel('Author', '/authors');
 const commentModel = commentService.registerModel('Comment', '/comments');
 ~~~~
 
-### Model relationship: Example use cases with combined fetchMode
+#### Model relationship: Example use cases with combined fetchMode
 
-#### Get a single item (article) and fetch related entities (author, comment)
+##### Get a single item (article) and fetch related entities (author, comment)
 ~~~js
 // Would get an article model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
 const article = await articleModel.get({id: i}, ['author','comments']);
@@ -101,7 +112,7 @@ const article = await articleModel.get({id: i}, ['author','comments']);
 // HTTP GET http://example.com/api/v1/comments?articleId[]=<user.id>
 ~~~
 
-#### Get a multiple items (article) and fetch related entities (author, comment)
+##### Get a multiple items (article) and fetch related entities (author, comment)
 
 ~~~js
 // Would get articles. Each item would have model with 2 extra fields author (the fetched author) and comments (array of fetched comments)
@@ -118,7 +129,7 @@ The examples above use a fetching of related entities with **fetchMode** of type
 In the above example, a single request is made to retrieve all authors related to all collected articles. This single request is made with all author IDs in a query string.
 However, this could cause lengthy Request URLs. And since URL have limited size (depends on the server and browser), request will large data set would fail. It is advised to use it only on small data set.
 
-## Model relationships: Example use cases with exclusive fetchMode
+### Model relationships: Example use cases with exclusive fetchMode
 
 ~~~js
 // set up
@@ -136,7 +147,7 @@ const authorModel = authorService.registerModel('Author', '/authors', RestServic
 const media = mediaService.registerModel('Media', '/:content_type/:content_id/media/:media_type');
 ~~~
 
-#### Get a single item with related entity (hasOne)
+##### Get a single item with related entity (hasOne)
 
 ~~~js
 const author = await authorModel.get({id: 107}, ['photo']);
@@ -145,7 +156,7 @@ const author = await authorModel.get({id: 107}, ['photo']);
 
 ~~~
 
-#### Get a single item with related entities (hasMany)
+##### Get a single item with related entities (hasMany)
 
 ~~~js
 const article = await articleModel.get({id: 1}, ['images']);
@@ -154,7 +165,7 @@ const article = await articleModel.get({id: 1}, ['images']);
 
 ~~~
 
-#### Get multiple items with related entities (hasOne)
+##### Get multiple items with related entities (hasOne)
 
 ~~~js
 const authors = await authorModel.query({}, ['photo']);
@@ -167,7 +178,7 @@ const authors = await authorModel.query({}, ['photo']);
 
 ~~~
 
-#### Get multiple items with related entities (hasMany)
+##### Get multiple items with related entities (hasMany)
 
 ~~~js
 const article = await articleModel.query({}, ['images']);
@@ -180,7 +191,7 @@ const article = await articleModel.query({}, ['images']);
 
 ~~~
 
-##### Limitations
+###### Limitations
 A request is made for each item. Consider using caching where relevant.
 
 ## Middlewares
