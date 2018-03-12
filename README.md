@@ -275,8 +275,8 @@ const oauthClient = new OAuth(
   'HMAC-SHA1'
 );
 
-async function addOAuthHeader (httpRequestOptions, next, resolve, {request: context}) {
-  const {accessToken, accessTokenSecret} = await context.request;
+async function addOAuthHeader (httpRequestOptions, next, resolve, {request: requestContext}) {
+  const {accessToken, accessTokenSecret} =  requestContext;
   const authHeader = oauthClient.authHeader(input.url, accessToken, accessTokenSecret, input.method)
   // add authorisation header
   httpRequestOptions.headers['Authorization'] = authHeader;
