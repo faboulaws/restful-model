@@ -67,7 +67,7 @@ Models can be configured using the RestService.modelConfig() method. This method
 Model id field can be configured using the **setIdField** method the the ModelConfig class.
 
 ~~~js
-const modelConfig = RestService.modelConfig().idField('userId'); // configure the name of the ID field
+const modelConfig = RestService.modelConfig().setIdField('userId'); // configure the name of the ID field
 const userService = new RestService('http://example.com/api/v1');
 const userModel = userService.registerModel('Users','/users')
 ~~~

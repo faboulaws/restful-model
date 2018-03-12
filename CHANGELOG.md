@@ -1,3 +1,9 @@
+## v0.0.15 (2018-03-12)
+
+Doc update
+
+    -  ModelConfig.setIdField()
+
 ## v0.0.15 (2018-03-11)
 
 Bug Fix
