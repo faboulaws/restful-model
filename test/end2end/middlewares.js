@@ -74,7 +74,7 @@ describe('middlewares', () => {
         next({name: 'abc'}, input);
       }
     };
-    const two = function one(input, next, resolve, xtra) {
+    const two = function one(input, next, resolve, context, xtra) {
       cache[xtra.url] = input;
       next(input);
     };
@@ -91,6 +91,37 @@ describe('middlewares', () => {
     assert(spyTwo.calledOnce, 'Must fail when a middleware throws and error');
 
     await model.get({});
+    assert(spyOne.calledTwice, 'Must fail when a middleware throws and error');
+    assert(spyTwo.calledOnce, 'Must fail when a middleware throws and error');
+  });
+
+  it('must call last middleware only once (cache in context)', async () => {
+    const service = new RestService('http://localhost:0050');
+    let cache = {};
+    const one = function one(input, next, resolve, {request: context}) {
+      if (context.cache[input.url]) {
+        resolve(context.cache[input.url]);
+      } else {
+        next({name: 'abc'}, input);
+      }
+    };
+    const two = function one(input, next, resolve, {request: context}, xtra) {
+      context.cache[xtra.url] = input;
+      next(input);
+    };
+    const spyOne = sinon.spy(one);
+    const spyTwo = sinon.spy(two);
+    service.useMiddlewares([
+      spyOne,
+      spyTwo
+    ]);
+
+    const model = service.registerModel('Model', '/models');
+    await model.get({}, [], {cache});
+    assert(spyOne.calledOnce, 'Must fail when a middleware throws and error');
+    assert(spyTwo.calledOnce, 'Must fail when a middleware throws and error');
+
+    await model.get({}, [], {cache});
     assert(spyOne.calledTwice, 'Must fail when a middleware throws and error');
     assert(spyTwo.calledOnce, 'Must fail when a middleware throws and error');
   });

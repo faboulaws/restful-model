@@ -1,3 +1,8 @@
+## v0.1.0 (2018-03-13)
+
+In this version a Context object is added as parameter to each middleware function, after the **resolve** parameter. A request context can be defined in the last argument of **query**, **get**, **create**, **update** and **delete** method of Models. In a middleware function the passed context would be under the request attribute of the passed context argument.
+This change might break existing code with custom middleware were extra arguments are passed between middlewares. However, the fix is simple. You only have to add the context argument before the **resolve** argument and after the extra args.
+
 ## v0.0.16 (2018-03-12)
 
 Doc update

@@ -1,7 +1,6 @@
 
 # Restful Model
 
-
 A module that abstracts the process of consuming a REST endpoint from both client and server side.
 
 # Installing
@@ -216,13 +215,14 @@ Middleware function arguments
 |input    | `mixed`|The input value would depend on the preceding middleware. It can be a request options a response or anything else. The first middleware always receives the request options.
 |next     |`function`|The callback used to deliver the middleware result to the next middleware.
 |resolve  | `function`|The resolver callback. This callback can be used to skip the rest of the middlewares and resolve the request with response data.
+|context  | `object`| Context object for sharing data with middlewares.
 
-Aside the arguments listed above, other arguments can be passed to  the following middleware by calling **next()** with additional argumemts. The additional arguments would be appended the argument list of the next middleware function.
+Aside the arguments listed above, other arguments can be passed to the following middleware by calling **next()** with additional arguments. The additional arguments would be appended the argument list of the next middleware function.
 
 
 ~~~js
 
-function(input, next, resolve, ...extraArgs) {
+function(input, next, resolve, context, ...extraArgs) {
   const result = process(input); //.... do something with input
   if(/*some condition*/){
      next(result, ...extraArgs)// pass result to next middleware
@@ -241,7 +241,7 @@ const {fetchRequest, fetchResponse} = RestService.defaultMiddlewares;
 const userService = new RestService('http://example.com/api/v1');
 
 async function addBasicAuthHeader (httpRequestOptions, next) {
-  const {username, password} = await getAuthData();// imaginary function
+  const {username, password} = await getAuthData(/*...*/);// imaginary function
   const hash = base64Encode(`${username}:${password}`); // imaginary function
   // add authorisation header
   httpRequestOptions.headers['Authorization'] = `Basic ${hash}`;
@@ -252,6 +252,51 @@ async function addBasicAuthHeader (httpRequestOptions, next) {
 userService.useMiddlewares([addBasicAuthHeader, fetchRequest, fetchResponse]);
 ~~~
 
+
+#### Example: Passing context to middlewares for oauth
+
+Setup
+
+~~~js
+
+const RestService = require('restful-model');
+const {OAuth} = require('oauth');
+
+const {fetchRequest, fetchResponse} = RestService.defaultMiddlewares;
+const userService = new RestService('http://example.com/api/v1');
+
+const oauthClient = new OAuth(
+  'http://some.3rd.party.api/api/v1',
+  'http://example.com/api/access_token',
+  clientID,
+  clientSecret,
+  '1.0',
+  callbackURL,
+  'HMAC-SHA1'
+);
+
+async function addOAuthHeader (httpRequestOptions, next, resolve, {request: context}) {
+  const {accessToken, accessTokenSecret} = await context.request;
+  const authHeader = oauthClient.authHeader(input.url, accessToken, accessTokenSecret, input.method)
+  // add authorisation header
+  httpRequestOptions.headers['Authorization'] = authHeader;
+  // pass request options to the next middleware (fetchRequest)
+  next(httpRequestOptions);
+}
+
+userService.useMiddlewares([addBasicAuthHeader, fetchRequest, fetchResponse]);
+
+~~~
+
+Now make request and pass request context
+
+~~~js
+
+const {accessToken, accessTokenSecret} = await getUserToken(/*...*/)// imaginary function
+
+// In the last argument we pass access token data to middlewares
+let users = await userModel.query({view: 'thin'}, [], {accessToken, accessTokenSecret});
+~~~
 
 #### Example: Adding Cache middleware
 
@@ -265,7 +310,8 @@ const requestHandler = function requestHandler(input, next, resolve) {
   if (cache[input.url]) { // use caches
     resolve(cache[input.url]);
   } else { // continure with the request
-    next(makeRequest(input), input);// passes the original input. the next middleware would receive it as extra argument
+    const response = await makeRequest(input);// imaginary function
+    next(response, input);// passes the original input. the next middleware would receive it as extra argument
   }
 };
 
