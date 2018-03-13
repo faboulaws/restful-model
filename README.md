@@ -1,6 +1,8 @@
 
 # Restful Model
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/faboulaws/restful-model.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/faboulaws/restful-model.svg?branch=master)](https://travis-ci.org/faboulaws/restful-model)
 [![Coverage Status](https://coveralls.io/repos/github/faboulaws/restful-model/badge.svg?branch=master)](https://coveralls.io/github/faboulaws/restful-model?branch=master)
 
