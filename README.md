@@ -1,6 +1,9 @@
 
 # Restful Model
 
+[![Build Status](https://travis-ci.org/faboulaws/restful-model.svg?branch=master)](https://travis-ci.org/faboulaws/restful-model)
+
+
 A module that abstracts the process of consuming a REST endpoint from both client and server side.
 
 # Installing
