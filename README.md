@@ -74,7 +74,7 @@ const userModel = userService.registerModel('Users','/users')
 
 ### Model Config - relationships
 
-**NOTE:** You have much better and more sophisticated options like [**GraphQL**](http://graphql.org/) for querying related models. However, not all services provide the option to consume their data via GraphQL. This means that you might have to write your own resolvers and schemas to consume a service that do not support GraphQL out of the box. In cases where using tools like GraphQL do not meet you requirements, you can use relationship features in this package.
+**NOTE:** You have much better and more sophisticated options like [**GraphQL**](http://graphql.org/) for querying related models. However, not all services provide the option to consume their data via GraphQL. This means that you might have to write your own resolvers and schemas to consume a service that do not support GraphQL out of the box. In cases where using tools like GraphQL do not meet your requirements, you can use relationship features in this package.
 
 Relationship can be configured using the **hasMany** and **hasOne** methods of the  ModelConfig class. These 2 methods of the ModelConfig class define model relationship and have the same signature.
 
