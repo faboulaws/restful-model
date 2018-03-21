@@ -38,7 +38,7 @@
     "nock": "^9.1.9",
     "nyc": "^11.6.0",
     "sinon": "^4.4.2",
-    "webpack": "^4.0.0",
+    "webpack": "4.1.1",
     "webpack-cli": "^2.0.9"
   },
   "dependencies": {
