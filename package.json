@@ -51,8 +51,8 @@
       "text-summary"
     ]
   },
-  "greenkeeper":{
-    "ignore":[
+  "greenkeeper": {
+    "ignore": [
       "eslint",
       "eslint-plugin-import",
       "nock",
