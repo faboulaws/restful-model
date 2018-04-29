@@ -50,5 +50,17 @@
       "lcov",
       "text-summary"
     ]
+  },
+  "greenkeeper":{
+    "ignore":[
+      "eslint",
+      "eslint-plugin-import",
+      "nock",
+      "nyc",
+      "mocka",
+      "sinon",
+      "webpack",
+      "webpack-cli"
+    ]
   }
 }
