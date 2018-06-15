@@ -22,8 +22,8 @@
   },
   "keywords": [
     "rest",
-    "orm",
-    "js"
+    "node",
+    "client"
   ],
   "author": "Lod Lawson <faboulaws@gmail.com>",
   "license": "MIT",

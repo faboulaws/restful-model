@@ -1,5 +1,6 @@
 const {expect, assert} = require('chai');
 const nock = require('nock');
+const sinon = require('sinon');
 
 const RestService = require('../../lib');
 const {
@@ -310,21 +311,120 @@ describe('Rest Tests', () => {
   });
 
   describe('custom endpoints', () => {
-    before(() => {
-      nock('http://localhost:0001')
-          .get('/articles4/1/images')
-          .reply(200, getImagesByArticleId(1));
+    const model = articleService.registerModel('Articles4', '/articles4', RestService.modelConfig().customActions({
+      getImages: {
+        method: 'get',
+        path: '/:id/images',
+      },
+      createArticleImage: {
+        method: 'post',
+        path: '/:id/images'
+      },
+      updateArticleImage: {
+        method: 'put',
+        path: '/:id/images'
+      },
+      deleteArticleImage: {
+        method: 'delete',
+        path: '/:id/images'
+      }
+    }));
+
+    const lastMiddleware = function (input, next) {
+      next(input);
+    };
+    const middlewareSpy = sinon.spy(lastMiddleware);
+
+    articleService.useMiddleware(middlewareSpy);
+
+    afterEach(() => {
+      middlewareSpy.reset();
     });
 
-    it('GET must work', async () => {
-      const model = articleService.registerModel('Articles4', '/articles4', RestService.modelConfig().customActions({
-        getImages: {
-          method: 'get',
-          path: '/:id/images',
-        }
-      }));
-      const result = await model.getImages({id: 1});
-      expect(result).to.eql(getImagesByArticleId(1));
+    describe('GET', () => {
+      beforeEach(() => {
+        nock('http://localhost:0001')
+            .get('/articles4/1/images')
+            .reply(200, getImagesByArticleId(1));
+
+        nock('http://localhost:0001')
+            .get('/articles4/1/images')
+            .query({view: 'thin'})
+            .reply(200, getImagesByArticleId(1));
+
+        nock('http://localhost:0001')
+            .get('/articles4/10/images')
+            .reply(200, getImagesByArticleId(3));
+      });
+
+      it('must work', async () => {
+        const result = await model.getImages({id: 1});
+        expect(result).to.eql(getImagesByArticleId(1));
+      });
+
+      it('must add query params', async () => {
+        const result = await model.getImages({id: 1, view: 'thin'});
+        expect(result).to.eql(getImagesByArticleId(1));
+      });
+
+      it('must pass context to middlewares', async () => {
+        const context = {contextData: 1};
+        const result = await model.getImages({id: 10}, context);
+        expect(result).to.eql(getImagesByArticleId(3));
+        const args = middlewareSpy.args[0];
+        expect(args[3]).to.eql({request: context});
+      });
+    });
+
+    describe('POST', () => {
+      beforeEach(() => {
+        nock('http://localhost:0001')
+            .post('/articles4/1/images')
+            .query({view: 'thin'})
+            .reply(200, getImagesByArticleId(2));
+      });
+
+      it('must send request with payload, query & context', async () => {
+        const context = {contextTestData: 'abc'};
+        const result = await model.createArticleImage({id: 1}, {view: 'thin'}, context);
+        expect(result).to.eql(getImagesByArticleId(2));
+        const args = middlewareSpy.args[0];
+        expect(args[3]).to.eql({request: context});
+      });
+    });
+
+    describe('PUT', () => {
+      beforeEach(() => {
+        nock('http://localhost:0001')
+            .put('/articles4/11/images')
+            .query({view: 'large'})
+            .reply(200, getImagesByArticleId(1));
+      });
+
+      it('must send request with payload, query & context', async () => {
+        const context = {contextTestData: 'xyz'};
+        const result = await model.updateArticleImage({id: 11, view: 'large'}, {}, context);
+        expect(result).to.eql(getImagesByArticleId(1));
+        const args = middlewareSpy.args[0];
+        expect(args[3]).to.eql({request: context});
+      });
+    });
+
+    describe('DELETE', () => {
+      beforeEach(() => {
+        nock('http://localhost:0001')
+            .delete('/articles4/12/images')
+            .query({view: 'medium'})
+            .reply(200, getImagesByArticleId(3));
+      });
+
+      it('must send request with payload, query & context', async () => {
+        const context = {contextTestData: 'xyz'};
+        const result = await model.deleteArticleImage({id: 12, view: 'medium'}, {}, context);
+        expect(result).to.eql(getImagesByArticleId(3));
+        const args = middlewareSpy.args[0];
+        expect(args[3]).to.eql({request: context});
+      });
     });
   });
 });

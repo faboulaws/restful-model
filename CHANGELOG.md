@@ -1,3 +1,9 @@
+## v0.1.7 (2018-05-16)
+
+Custom action bug fixes
+- Context not passed to middlewares when using custom actions
+- Incorrect parameters send in request middleware
+
 ## v0.1.1 - v0.1.4 (2018-03-13)
 
 Documentation update
