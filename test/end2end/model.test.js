@@ -338,7 +338,7 @@ describe('Rest Tests', () => {
     articleService.useMiddleware(middlewareSpy);
 
     afterEach(() => {
-      middlewareSpy.reset();
+      middlewareSpy.resetHistory();
     });
 
     describe('GET', () => {
