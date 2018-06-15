@@ -3,3 +3,4 @@ webpack.config.js
 .eslintrc
 .idea
 examples
+.nyc_output/
